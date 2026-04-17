@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Place Order</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(120deg,#ff9a9e,#fad0c4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+h2 {
+    color: #ff4b5c;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 95%;
+    padding: 10px;
+    margin-top: 10px;
+    background: #ff4b5c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e63e50;
+}
+</style>
+
+<script>
+(function(){
+  emailjs.init("YOUR_PUBLIC_KEY");
+})();
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+<h2>🛒 Place Order</h2>
+
+<input type="text" id="product" placeholder="Product Name">
+<input type="text" id="address" placeholder="Delivery Address">
+
+<button onclick="sendOrderOTP()">Send OTP</button>
+
+<input type="text" id="otpInput" placeholder="Enter OTP">
+<button onclick="verifyOrderOTP()">Verify OTP</button>
+
+<button onclick="placeOrder()">Confirm Order</button>
+</div>
+
+<script>
+let orderOTP = "";
+let otpVerified = false;
+
+function sendOrderOTP() {
+    let email = prompt("Enter your email:");
+
+    orderOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: email,
+        otp: orderOTP
+    })
+    .then(() => alert("OTP sent ✅"))
+    .catch(() => alert("Failed ❌"));
+}
+
+function verifyOrderOTP() {
+    let userOTP = document.getElementById("otpInput").value;
+
+    if (userOTP === orderOTP) {
+        otpVerified = true;
+        alert("OTP Verified ✅");
+    } else {
+        alert("Wrong OTP ❌");
+    }
+}
+
+function placeOrder() {
+    if (!otpVerified) {
+        alert("Verify OTP first!");
+        return;
+    }
+
+    let order = {
+        product: document.getElementById("product").value,
+        address: document.getElementById("address").value,
+        date: new Date().toLocaleString()
+    };
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push(order);
+
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    alert("Order Placed 🎉");
+
+    window.location.href = "orders.html";
+}
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Orders</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #ff4b5c;
+}
+
+.order-container {
+    max-width: 600px;
+    margin: auto;
+}
+
+.order-card {
+    background: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.order-card h3 {
+    margin: 0;
+    color: #333;
+}
+
+.order-card p {
+    margin: 5px 0;
+    color: gray;
+}
+
+.order-card small {
+    color: #888;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>📦 My Orders</h2>
+
+<div class="order-container" id="orderList"></div>
+
+<script>
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let container = document.getElementById("orderList");
+
+if (orders.length === 0) {
+    container.innerHTML = "<p style='text-align:center;'>No orders yet</p>";
+} else {
+    orders.forEach(order => {
+        container.innerHTML += `
+        <div class="order-card">
+            <h3>${order.product}</h3>
+            <p>${order.address}</p>
+            <small>${order.date}</small>
+        </div>`;
+    });
+}
+</script>
+
+</body>
+</html>

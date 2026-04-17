@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Spring Fashion</title>
+
+<style>
+body { margin:0; font-family: Arial; background:#f5f5f5; }
+
+/* NAVBAR */
+.navbar {
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:10px 20px;
+ background:hsl(0, 0%, 100%);
+ box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo { color:#ff3fbf; font-size:22px; font-weight:bold; }
+
+.menu span { margin:0 10px; cursor:pointer; }
+
+.search {
+ width:40%;
+ padding:8px;
+ border-radius:5px;
+ border:1px solid #ccc;
+}
+
+/* HERO */
+.hero img {
+ width:100%;
+ height:300px;
+ object-fit:cover;
+}
+
+/* CATEGORY IMAGES */
+.categories {
+ display:flex;
+ gap:10px;
+ padding:20px;
+}
+.categories img {
+ width:25%;
+ height:150px;
+ object-fit:cover;
+ border-radius:10px;
+}
+
+/* SECTION */
+.section { padding:20px; }
+.section h2 { margin-bottom:10px; }
+
+/* PRODUCTS */
+.products {
+ display:grid;
+ grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+ gap:15px;
+}
+
+.card {
+ background:white;
+ padding:10px;
+ border-radius:10px;
+ transition:0.3s;
+}
+
+.card:hover { transform:scale(1.05); }
+
+.card img {
+ width:100%;
+ height:200px;
+ object-fit:cover;
+ border-radius:10px;
+}
+
+.price { color:#ff3f6c; font-weight:bold; }
+.old { text-decoration:line-through; color:gray; font-size:12px; }
+.rating { color:green; }
+
+button {
+ padding:6px;
+ margin:3px;
+ border:none;
+ cursor:pointer;
+ border-radius:5px;
+}
+
+.cart { background:#ff3f6c; color:white; }
+.buy { background:green; color:white; }
+.wish { background:gray; color:white; }
+
+</style>
+</head>
+
+<body>
+   
+
+<div class="navbar">
+   
+ <div class="logo">🌸 Spring Fashion</div>
+
+ <div class="menu">
+  <span>Home</span>
+  <span>Men</span>
+  <span>Women</span>
+  <span>Kids</span>
+  <span>Offers</span>
+ </div>
+
+ <input type="text" id="searchBox" placeholder="Search products..." onkeyup="searchProduct()">
+
+ <div>
+  <button onclick="viewWishlist()">❤️</button>
+  <button onclick="viewCart()">🛒</button>
+  <button onclick="logout()">Logout</button>
+  <script src="script.js"></script>
+ </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+<img src="images/fahhh.jpg">
+</div>
+
+<!-- CATEGORY IMAGES -->
+<div class="categories">
+<img src="https://images.unsplash.com/photo-1520975916090-3105956dac38">
+<img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c">
+<img src="images/fash.jpg">
+<img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab">
+</div>
+
+<!-- WOMEN -->
+<div class="section">
+    <div class="card"></div>
+<h2>🔥 Trending Women Fashion</h2>
+<div class="products" id="women"></div>
+</div>
+
+<!-- MEN -->
+<div class="section">
+    <div class="card"></div>
+<h2>👕 Men's Collection</h2>
+<div class="products" id="men"></div>
+</div>
+
+<!-- KIDS -->
+<div class="section">
+    <div class="card"></div>
+<h2>🧒 Kids Collection</h2>
+<div class="products" id="kids"></div>
+</div>
+
+<!-- DEALS -->
+<div class="section">
+    <div class="card"></div>
+<h2>💥 Today's Top Deals</h2>
+<div class="products" id="deals"></div>
+</div>
+
+<script>
+let cart = [];
+let wishlist = [];
+
+// PRODUCTS DATA
+let women = [
+{n:"Saree", p:999, old:1999, img:"images/saree.jpg"},
+{n:"Black Banarsi Saree Kashmiri Design", p:999, old:1999, img:"images/banarsisaree.jpg"},
+{n:"Kurti", p:699, old:1299, img:"images/kurti.jpg"},
+{n:"Lehenga", p:1999, old:3999, img:"images/lehenga.jpg"},
+{n:"Dress", p:1299, old:2499, img:"images/dress.jpg"},
+{n:"Top", p:499, old:999, img:"images/top.jpg"}
+];
+
+let men = [
+{n:"Shirt", p:899, old:1599, img:"images/shirt.jpg"},
+{n:"T-Shirt", p:499, old:999, img:"images/tshirt.jpg"},
+{n:"Jeans", p:1299, old:2499, img:"images/jeans.jpg"},
+{n:"Jacket", p:1499, old:2999, img:"images/jacket.jpg"},
+{n:"Shoes", p:1999, old:3999, img:"images/shoees.jpg"}
+];
+
+let kids = [
+{n:"Kids Dress", p:599, old:999, img:"images/kidsdress.jpg"},
+{n:"Kids Shirt", p:399, old:799, img:"images/kidsshirt.jpg"},
+{n:"Kids Shoes", p:699, old:1299, img:"images/kidsshoes.jpg"},
+{n:"Girl White Pearl Lehenga", p:699, old:1299, img:"images/kids.jpg"}
+];
+
+let deals = [
+{n:"Sports Shoes", p:999, old:2999, img:"images/sportshoes.jpg"},
+{n:"Watch", p:1499, old:3499, img:"images/waatch.jpg"}
+];
+
+// DISPLAY FUNCTION
+function show(data, id){
+let html="";
+data.forEach(p=>{
+html+=`
+<div class="card">
+<img src="${p.img}">
+<h4>${p.n}</h4>
+<div class="price">₹${p.p} <span class="old">₹${p.old}</span></div>
+<div class="rating">⭐ 4.5</div>
+
+<button class="cart" onclick="addCart('${p.n}')">Add</button>
+<button class="buy" onclick="buy('${p.n}')">Buy</button>
+<button class="wish" onclick="addWish('${p.n}')">❤️</button>
+</div>`;
+});
+document.getElementById(id).innerHTML=html;
+}
+
+show(women,"women");
+show(men,"men");
+show(kids,"kids");
+show(deals,"deals");
+
+// FUNCTIONS
+function addCart(i){ cart.push(i); alert(i+" added to cart"); }
+function viewCart(){ alert("Cart: "+cart.join(", ")); }
+
+function addWish(i){ wishlist.push(i); alert(i+" added to wishlist"); }
+function viewWishlist(){ alert("Wishlist: "+wishlist.join(", ")); }
+
+function buy(i){
+localStorage.setItem("product",i);
+window.location="order.html";
+}
+
+// SEARCH
+function searchProduct(){
+let input = document.querySelector(".search").value.toLowerCase();
+let all = women.concat(men, kids, deals);
+let filtered = all.filter(p => p.n.toLowerCase().includes(input));
+show(filtered, "women");
+}
+
+
+</script>
+<script src="script.js"></script>
+</body>
+</html>
